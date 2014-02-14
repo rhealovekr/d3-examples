@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>D3.js Sandbox</title>
+    <style type="text/css">
+        div.bar {
+            display: inline-block;
+            width: 20px;
+            height: 75px;
+            background-color: teal;
+            margin-right: 2px;
+        }
+        
+        div.chart {
+            font: 10px sans-serif;
+            background-color: steelblue;
+            text-align: right;
+            padding: 3px;
+            margin: 1px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <script type="text/javascript" src="d3.v3.js"></script>
+    <script type="text/javascript">
+        // my D3 core will go here
+        function x(d) { return d.x; }
+        function y(d) { return d.y; }
+        
+        var data = [
+        {x: 100.0, y: 50.14},
+        {x: 200.0, y: 70.14}
+        ];
+        
+        var w = 500;
+        var h = 100;
+        var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+                    
+        svg.append("rect")
+            .attr("width", 400)
+            .attr("height", 400)
+            .attr("fill", "lavender");
+        
+        var circle = svg.selectAll("circle")
+        .data(data);
+        
+        circle.enter().append("circle")
+        .attr("cx", x)
+        .attr("cy", y)
+        .attr("r", 10.5);
+        
+       
+            
+        
+
+    </script>
+    <p>D3 Example</p>
+    
+</body>
+</html>
