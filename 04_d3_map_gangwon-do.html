@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>D3.js Example</title>
+    <title>D3 The hot spring and mineral water of Gangwondo</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/themes/base/jquery-ui.css" />
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
@@ -11,37 +11,27 @@
 
 </head>
 <body>
-    <p>Map Korea</p>
     <div id="container" class="container">
-        <h1>Gangwon Province</h1>
+        <h1>강원도 온천 약수The hot spring and mineral water of Gangwondo</h1>
         
-        <div id="radio">
-            <span class="title">지명표시</span>
-        <input type="radio" id="radio1" name="radio" value="on" checked><label for="radio1">On</label>
-        <input type="radio" id="radio2" name="radio" value="off"><label for="radio2">Off</label>
-      </div>
-      
-      <div id="control" class="ui-widget-header ui-corner-all">
-          <button id="zoomin">확대</button>
-          <button id="zoomout">축소</button>
-        </div>
-    </div>
+    • Last Updated: 2013-08-12 15:34:18 • Data Source: <a href="http://www.gangwon.to/xml_template/info/content_04_01.xml">해양심층수타라소테라피센터</a>
 
+    </div>
     
     <script type="text/javascript">
         // my D3 code will go here
         var width = 700,
         height = 700,
-        initialScale = 5500,
+        initialScale = 5450,
         initialX = -11900,
-        initialY = 4050,
+        initialY = 4200,
         centered,
         labels;
 
     var projection = d3.geo.mercator()
         .scale(initialScale)
         .translate([initialX, initialY]);
-    
+        
     var path = d3.geo.path()
         .projection(projection);
     
@@ -65,25 +55,65 @@
         .attr("width", width)
         .attr("height", height);
     
-    d3.json("data/map_korea.json", function(json) {
-      states.selectAll("path")
+    states.transition()
+        .duration(1000)
+        .attr("transform", "translate(" + 800 + "," + 600 + ")scale(" + 3 + ")translate(" + -450 + "," + -390 + ")");
+        
+    d3.json("data/map_gangwon.json", function(json) {
+        states.selectAll("path")
           .data(json.features)
           .enter().append("path")
           .attr("d", path)
-          .attr("id", function(d) { return 'path-'+d.id; })
-          .on("click", click);
-          
-      labels = states.selectAll("text")
-          .data(json.features)
-          .enter().append("text")
-          .attr("transform", labelsTransform)
-          .attr("id", function(d) { return 'label-'+d.id; })
-          .attr('text-anchor', 'middle')
-          .attr("dy", ".35em")
-          .on("click", click)
-          .text(function(d) { return d.properties.Name; });
+          .attr("id", function(d) { return 'path-'+d.id; });
     });
     
+    // fill data
+    var dataset = [
+        [128.503063482785, 38.2081202869797],
+        [128.068380190806, 37.5671734425048],
+        [129.179580372102, 37.4465609476381],
+        [128.568381726975, 38.2461636948428],
+        [128.527108694292, 38.2081048130607],
+        [128.446540279686, 38.0851598442664],
+        [128.419990912479, 38.5101031595929],
+        [128.419990912479, 38.5101031595929],
+        [128.839007304494, 37.8438832178013],
+        [128.6523573, 37.8383682],
+        [128.671700131825, 37.1464908094684],
+        [128.463822059334, 37.8624738685104],
+        [128.6523573, 37.8383682],
+        [128.5533096, 37.63715],
+        [128.402496213947, 37.938901098442],
+        [128.518243101458, 37.9435382088934],
+        [129.0132174, 37.6966281],
+        [128.0831358, 37.9659379],
+        [128.259959, 37.8741362],
+        [128.063198560114, 38.165794847397],
+        [128.784919666053, 37.327972776129],
+        [128.315961809164, 38.1148363838162],
+        [127.889672270012, 38.0371819752278],
+        [128.5533096, 37.63715],
+        [128.442455641839, 38.0788058639535] ];
+
+    svg.selectAll("circle")
+        .data(dataset)
+        .enter()
+        .append("circle")
+        .text(function(d) {
+           return d[0] + "," + d[1];
+        })
+        .attr("cx", function(d) {
+            return (projection([d[0], d[1]])[0]);
+        })
+        .attr("cy", function(d) {
+            return (projection([d[0], d[1]])[1]);;
+        })
+        .attr("r",5)
+        .attr("fill", "steelblue")
+        .transition()
+        .duration(1000)
+        .attr("transform", "translate(" + 790 + "," + 600 + ")scale(" + 3 + ")translate(" + -450 + "," + -390 + ")");
+
     function click(d) {
       var x, y, k;
       
@@ -112,12 +142,19 @@
     function zoom() {
       projection.translate(d3.event.translate).scale(d3.event.scale);
       states.selectAll("path").attr("d", path);
+      svg.selectAll("circle").attr("transform", circleTransform);
       
-      labels.attr("transform", labelsTransform);
+      //labels.attr("transform", labelsTransform);
+    }
+    
+    function circleTransform(d) {
+        var arr = path.centroid(d);
+        arr[1] += (d3.event && d3.event.scale) ? (d3.event.scale / height + 20) : (initialScale / height + 20);
+        
+        return "translate(" + arr + ")";
     }
     
     function labelsTransform(d) {
-      // 경기도가 서울특별시와 겹쳐서 예외 처리
       if (d.id == 8) {
         var arr = path.centroid(d);
         arr[1] += (d3.event && d3.event.scale) ? (d3.event.scale / height + 20) : (initialScale / height + 20);
